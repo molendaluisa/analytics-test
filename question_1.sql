@@ -3,7 +3,7 @@
 WITH category_acc_agg AS (
    SELECT
        c.CATEGORY_SECTION                      AS category_section,
-       COUNT(ad.ACCOUNT_ID)                    AS cnt_account,
+       COUNT(DISTINCT ad.ACCOUNT_ID)           AS cnt_account,
    FROM `luisa-space.sandbox.f_ads` ad
    LEFT JOIN `luisa-space.sandbox.d_categories` c
        ON c.CATEGORY_GROUP_ID = ad.CATEGORY_GROUP_ID
