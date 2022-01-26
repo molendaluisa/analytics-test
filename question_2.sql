@@ -2,15 +2,19 @@
    Compare payment methods between the first and second ad insertion. */
    
 WITH user_payment_nr AS (
+--selecting user, payment method and ranking 1st and 2nd ad insertion
+
    SELECT
        DISTINCT ad.ACCOUNT_ID                                                          AS user,
        ad.FINAL_PAY_TYPE_FCT                                                           AS payment_method,
-       RANK() OVER (PARTITION BY ad.ACCOUNT_ID ORDER BY ad.PUBLISH_DTT ASC)           AS payment_nr
+       RANK() OVER (PARTITION BY ad.ACCOUNT_ID ORDER BY ad.PUBLISH_DTT ASC)            AS payment_nr
    FROM `luisa-space.sandbox.f_ads` ad
    ORDER BY 1, 3
 ),
  
 pivot_payments AS (
+--transposing 1st and 2nd payment method from rows into columns
+
    SELECT
        *
    FROM user_payment_nr
@@ -19,6 +23,8 @@ pivot_payments AS (
 ),
  
 payment_change_mapping AS (
+--mapping same payment method or the switch (from swish to paycard or from paycard to swish)
+
    SELECT
        *,
  
@@ -30,6 +36,8 @@ payment_change_mapping AS (
 ),
  
 agg AS (
+--aggregating on payment change
+
    SELECT
        payment_change,
        COUNT(*)                                                                        AS volume
@@ -38,6 +46,7 @@ agg AS (
    GROUP BY 1
 )
  
+--calculating percentage of total
 SELECT
    *,
    ROUND(100 * volume/SUM(volume) OVER())                                              AS percentage_of_total

@@ -2,6 +2,7 @@
    Consider first and second ad insertion across category groups and category sections */
 
 WITH user_ad_nr AS (
+--selecting user, category id and ranking 1st and 2nd ad insertion
    SELECT
        DISTINCT ad.ACCOUNT_ID                                                                          AS user,
        ad.CATEGORY_GROUP_ID                                                                            AS category_group_id,
@@ -11,6 +12,8 @@ WITH user_ad_nr AS (
 ),
  
 pivot_ads AS (
+--transposing 1st and 2nd category id from rows into columns
+
    SELECT
        *
    FROM user_ad_nr
@@ -19,8 +22,11 @@ pivot_ads AS (
 ),
  
 category_change_mapping AS (
+--mapping same id or the switch in a group or section level
+
    SELECT
        user,
+
        CASE
            WHEN c1.CATEGORY_GROUP = c2.CATEGORY_GROUP THEN 'same group'
            ELSE CONCAT(c1.CATEGORY_GROUP, ' to ', c2.CATEGORY_GROUP)
@@ -39,12 +45,14 @@ category_change_mapping AS (
 ),
  
 agg AS (
+--aggregating users by section and group change
+
    SELECT
        section_change,
        group_change,
        COUNT(*)                                                                                        AS volume
    FROM category_change_mapping
-   WHERE section_change IS NOT NULL OR group_change IS NOT NULL
+   WHERE section_change IS NOT NULL OR group_change IS NOT NULL --excluding one time user ad insertion (users that only inserted one ad)
    GROUP BY 1, 2
 )
  

@@ -2,6 +2,8 @@
 Is number of received ad views a good predictor of selling time? */
 
 WITH calc_selling_time AS (
+--calculating selling time in days and joining with amount of views
+
     SELECT
         c.CATEGORY_SECTION                              AS category_section,
         DATE_DIFF(DELETE_DTT, PUBLISH_DTT, DAY)         AS selling_time_day,
@@ -11,10 +13,12 @@ WITH calc_selling_time AS (
         ON ad.CATEGORY_GROUP_ID = c.CATEGORY_GROUP_ID
     LEFT JOIN `luisa-space.sandbox.f_views` v
         ON ad.AD_ID = v.AD_ID
-    WHERE REMOVE_REASON_FCT = 'sold_on_blocket'
+    WHERE REMOVE_REASON_FCT = 'sold_on_blocket' --include only items sold on blocket
 )
 
 SELECT
+-- aggregating on a section level
+
     category_section,
     ROUND(AVG(selling_time_day))                        AS avg_selling_time_day,
     SUM(ad_views)                                       AS sum_ad_views
