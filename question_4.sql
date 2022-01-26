@@ -3,7 +3,7 @@
    
 WITH calc_selling_time AS (
    SELECT
-       c.CATEGORY_GROUP                                AS category_group,
+       c.CATEGORY_SECTION                              AS category_section,
        ad.ADDITIONAL_PRODUCT_TYPE                      AS add_on,
        DATE_DIFF(DELETE_DTT, PUBLISH_DTT, DAY)         AS selling_time_day
    FROM `luisa-space.sandbox.f_ads` ad
@@ -14,7 +14,7 @@ WITH calc_selling_time AS (
  
 agg_and_avg AS (
    SELECT
-       category_group,
+       category_section,
        add_on,
        ROUND(AVG(selling_time_day))                        AS avg_selling_time_day
    FROM calc_selling_time
