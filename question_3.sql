@@ -1,6 +1,6 @@
 /*  3. How willing are users to insert ads in different categories?
    Consider first and second ad insertion across category groups and category sections */
-   
+
 WITH user_ad_nr AS (
    SELECT
        DISTINCT ad.ACCOUNT_ID                                                                          AS user,
@@ -38,27 +38,18 @@ category_change_mapping AS (
        ON pa._2 = c2.CATEGORY_GROUP_ID
 ),
  
-section_agg AS (
+agg AS (
    SELECT
        section_change,
-       COUNT(*)                                                                                        AS volume
-   FROM category_change_mapping
-   WHERE section_change IS NOT NULL
-   GROUP BY 1
-),
- 
-group_agg AS (
-   SELECT
        group_change,
        COUNT(*)                                                                                        AS volume
    FROM category_change_mapping
-   WHERE group_change IS NOT NULL
-   GROUP BY 1
+   WHERE section_change IS NOT NULL OR group_change IS NOT NULL
+   GROUP BY 1, 2
 )
  
+ 
 SELECT
-   *,
-   ROUND(100 * volume/SUM(volume) OVER())                                                              AS percentage_of_total
-FROM group_agg
---FROM section_agg
-ORDER BY 2 DESC
+   *
+FROM agg
+ORDER BY 3 DESC
